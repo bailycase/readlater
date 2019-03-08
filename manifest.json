@@ -1,6 +1,6 @@
 {
     "name": "SaveForLater",
-    "version": "0.0.1",
+    "version": "0.2",
     "description": "Save your webpages to read later",
     "permissions": ["declarativeContent", "storage", "contextMenus", "tabs"],
     "background": {
