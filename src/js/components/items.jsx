@@ -8,7 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import Tooltip from '@material-ui/core/Tooltip';
 import { CardActionArea } from '@material-ui/core';
-
+import { SaveConsumer } from './context';
 
 const styles = {
   card: {
@@ -17,72 +17,62 @@ const styles = {
   },
 };
 
-class items extends React.Component {
+class Items extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      urls: [],
     };
-    this.removeItem = this.removeItem.bind(this);
-  }
-
-  componentDidMount() {
-    chrome.storage.sync.get({ itemUrls: [] }, (result) => {
-      this.setState({ urls: result.itemUrls });
-    });
-  }
-
-  removeItem(url) {
-    window.open(url);
-    const { urls } = this.state; // array of state
-    const index = urls.findIndex(x => x.url === url);
-    urls.splice(index, 1);
-    this.setState({ urls });
-    chrome.storage.sync.set({ itemUrls: urls });
   }
 
   render() {
     const { classes } = this.props;
-    const { urls } = this.state;
     return (
-      <Grid
-        container
-        spacing={8}
-        direction="column"
-        alignItems="center"
-      >
-        <Grid item xs={6} />
-        {urls.map(value => (
-          <Grid key={value} item xs zeroMinWidth>
-            <Card className={classes.card}>
-              <CardActionArea onClick={() => {
-                this.removeItem(value.url);
-              }}
-              >
-                <CardContent className={classes.cContent}>
-                  <Tooltip title={(
-                    <Typography variant="subheading" component="h3">
-                      {value.title}
-                    </Typography>
+      <div className="items">
+        <SaveConsumer>
+          {context => (
+            <Grid
+              container
+              spacing={8}
+              direction="column"
+              alignItems="center"
+            >
+              <Grid item xs={6} />
+              {context.state.data.map(value => (
+                <Grid key={value} item xs zeroMinWidth>
+                  <Card className={classes.card}>
+                    <CardActionArea onClick={() => {
+                      context.removeItem(value.url);
+                      window.open(value.url);
+                    }}
+                    >
+                      <CardContent className={classes.cContent}>
+                        <Tooltip title={(
+                          <Typography variant="subheading" component="h3">
+                            {value.title}
+                          </Typography>
 )}
-                  >
-                    <Typography gutterBottom variant="h5" component="h2" noWrap>
-                      {value.title}
-                    </Typography>
-                  </Tooltip>
-                  <Typography component="p" noWrap>
-                    {value.url}
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+                        >
+                          <Typography gutterBottom variant="h5" component="h2" noWrap>
+                            {value.title}
+                          </Typography>
+                        </Tooltip>
+                        <Typography component="p" noWrap>
+                          {value.url}
+                        </Typography>
+                      </CardContent>
+                    </CardActionArea>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          )}
+        </SaveConsumer>
+      </div>
     );
   }
 }
-items.propTypes = {
-  classes: PropTypes.object.isRequired,
+Items.propTypes = {
+  classes: PropTypes.any,
 };
-export default withStyles(styles)(items);
+
+export default withStyles(styles)(Items);
